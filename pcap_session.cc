@@ -238,6 +238,8 @@ void PcapSession::Open(bool live, const Nan::FunctionCallbackInfo<Value>& info)
             Nan::ThrowError("error setting immediate mode");
             return;
         }
+      
+        pcap_set_timeout(session->pcap_handle, 1);
 
         if (Nan::To<int32_t>(info[6]).FromJust()) {
             if (pcap_set_rfmon(session->pcap_handle, 1) != 0) {
