@@ -182,6 +182,9 @@ TCPOptions.prototype.toString = function () {
     if (this.sack !== null) {
         ret += "sack:" + this.sack.join(",") + " ";
     }
+    if (this.layout !== null) {
+        ret += "layout:" + this.layout + " ";
+    }
 
     if (ret.length === 0) {
         ret = ". ";
