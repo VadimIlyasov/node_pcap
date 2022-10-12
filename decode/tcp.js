@@ -1,4 +1,3 @@
-
 function TCPFlags(emitter) {
     this.emitter = emitter;
     this.nonce = undefined;
@@ -64,36 +63,44 @@ function TCPOptions() {
     this.sack = null;
     this.timestamp = null;
     this.echo = null;
+    this.layout = null;
 }
 
 TCPOptions.prototype.decode = function (raw_packet, offset, len) {
     var end_offset = offset + len;
+    var layout = '';
 
     while (offset < end_offset) {
         switch (raw_packet[offset]) {
         case 0: // end of options list
             offset = end_offset;
+            layout += 'eoo,';
             break;
         case 1: // NOP / padding
             offset += 1;
+            layout += 'nop,';
             break;
         case 2:
             offset += 2;
             this.mss = raw_packet.readUInt16BE(offset);
             offset += 2;
+            layout += 'mss,';
             break;
         case 3:
             offset += 2;
             this.window_scale = raw_packet[offset];
             offset += 1;
+            layout += 'ws,';
             break;
         case 4:
             this.sack_ok = true;
             offset += 2;
+            layout += 'sack_ok,';
             break;
         case 5:
             this.sack = [];
             offset += 1;
+            layout += 'sack,';
             switch (raw_packet[offset]) {
             case 10:
                 offset += 1;
@@ -138,6 +145,7 @@ TCPOptions.prototype.decode = function (raw_packet, offset, len) {
             offset += 4;
             this.echo = raw_packet.readUInt32BE(offset);
             offset += 4;
+            layout += 'ts,';
             break;
         case 254:
         case 255:
@@ -150,6 +158,12 @@ TCPOptions.prototype.decode = function (raw_packet, offset, len) {
             throw new Error("Don't know how to process TCP option " + raw_packet[offset]);
         }
     }
+
+    if (layout) {
+        layout = layout.substring(0, layout.length-1);
+    }
+
+    this.layout = layout;
 
     return this;
 };
