@@ -155,7 +155,9 @@ TCPOptions.prototype.decode = function (raw_packet, offset, len) {
             offset += raw_packet.readUInt8(offset + 1);
             break;
         default:
-            throw new Error("Don't know how to process TCP option " + raw_packet[offset]);
+            // just ignore if unknown
+            break;
+            //throw new Error("Don't know how to process TCP option " + raw_packet[offset]);
         }
     }
 
